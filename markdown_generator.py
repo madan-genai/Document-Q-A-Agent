@@ -1,23 +1,3 @@
-# markdown_generator.py — Converts loaded documents into markdown with page markers,
-# and implements smart chunking that preserves tables as atomic units.
-#
-# NEW CONCEPTS for students:
-#
-#   1. PAGE MARKERS — we embed <!-- page:N --> comments in the markdown so every
-#      chunk we create can tell the frontend exactly which page it came from.
-#
-#   2. SMART CHUNKING — standard RecursiveCharacterTextSplitter splits blindly.
-#      A table cut in half produces broken columns and missing headers.
-#      Smart chunking detects table blocks (lines starting with |) and keeps
-#      them as ONE atomic chunk — never split across two chunks.
-#
-# Pipeline:
-#   List[Document]  (from file_loader)
-#     ↓  generate_markdown()
-#   Single markdown string with <!-- page:N --> markers
-#     ↓  smart_chunk()
-#   List[{"text": str, "page_number": int, "is_table": bool}]
-
 import re
 import logging
 from pathlib import Path
@@ -34,10 +14,8 @@ CHUNK_OVERLAP = 50    # Characters shared between consecutive prose chunks
 # Matches <!-- page:1 --> or <!-- page:12 --> etc.
 PAGE_MARKER_RE = re.compile(r'<!--\s*page:(\d+)\s*-->')
 
-
-# ─────────────────────────────────────────────────────────────────────────────
 # STEP 1 — Generate markdown with page markers
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 def generate_markdown(docs: List[Document], file_name: str) -> str:
     """
@@ -72,10 +50,7 @@ def generate_markdown(docs: List[Document], file_name: str) -> str:
     # Join pages with a visible --- separator (renders as <hr> in markdown)
     return "\n\n---\n\n".join(parts)
 
-
-# ─────────────────────────────────────────────────────────────────────────────
 # STEP 2 — Smart chunking
-# ─────────────────────────────────────────────────────────────────────────────
 
 def smart_chunk(markdown_text: str, chunk_size: int = CHUNK_SIZE, chunk_overlap: int = CHUNK_OVERLAP) -> List[Dict]:
     """
