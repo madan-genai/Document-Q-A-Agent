@@ -1,10 +1,3 @@
-# file_loader.py — Loads any supported file type into LangChain Documents.
-# Identical to Lecture 17 — supports PDF, DOCX, MD, CSV, TXT.
-#
-# A LangChain Document has two fields:
-#   doc.page_content  → the text of this page/row/section
-#   doc.metadata      → dict with file_name, file_type, page_number
-
 import logging
 from pathlib import Path
 from typing import List
@@ -75,7 +68,7 @@ def _load_by_extension(file_path: str, ext: str) -> List[Document]:
             loader = UnstructuredMarkdownLoader(file_path)
             docs   = loader.load()
         except (ImportError, ModuleNotFoundError):
-            loader = TextLoader(file_path, encoding="utf-8")   # Fallback: 'unstructured' not installed
+            loader = TextLoader(file_path, encoding="utf-8")  d
             docs   = loader.load()
         for doc in docs:
             doc.metadata["page_number"] = 1
