@@ -1,6 +1,3 @@
-# routes.py — Route declarations only.
-# Maps every URL path + HTTP method to its handler in api.py.
-
 from fastapi import APIRouter
 
 from api import (
