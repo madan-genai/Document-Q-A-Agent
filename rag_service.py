@@ -1,20 +1,3 @@
-# rag_service.py — Core RAG logic for Document Butler.
-#
-# NEW vs Lecture 18:
-#   1. All file types supported (PDF, DOCX, MD, CSV, TXT) via file_loader
-#   2. Every document → markdown with page markers via markdown_generator
-#   3. Smart chunking preserves tables as atomic units
-#   4. Original file saved permanently so frontend can serve it
-#   5. Citations include doc_id so frontend can open the file viewer
-#
-# Indexing pipeline:
-#   Any file
-#     ↓ file_loader.load_file()          load pages/rows into Documents
-#     ↓ markdown_generator.generate_markdown()   convert to markdown + page markers
-#     ↓ markdown_generator.smart_chunk()         split (tables kept intact)
-#     ↓ embeddings.embed_query()         convert each chunk to vector
-#     ↓ qdrant_client.upsert()           store vector + full payload in Qdrant
-
 import asyncio
 import hashlib
 import json
@@ -48,9 +31,7 @@ from model import Citation
 logger = logging.getLogger(__name__)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────────────────────────────────────────
+# Helper
 
 def compute_doc_id(file_name: str) -> str:
     """Deterministic ID from filename — same file always gets the same doc_id."""
@@ -84,9 +65,8 @@ def ensure_collection(client: QdrantClient, collection_name: str, vector_size: i
     )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+
 # INDEXING
-# ─────────────────────────────────────────────────────────────────────────────
 
 def index_document(
     file_path       : str,       # Temp path of the uploaded file
@@ -285,9 +265,8 @@ Answer:"""
     return {"answer": answer, "references": citations}
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # DOCUMENT MANAGEMENT
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 async def query_stream(
     question        : str,
